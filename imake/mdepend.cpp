@@ -1,8 +1,5 @@
 XCOMM!/bin/sh
 XCOMM
-XCOMM $Xorg: mdepend.cpp,v 1.3 2000/08/17 19:41:52 cpqbld Exp $
-XCOMM $XdotOrg: $
-XCOMM
 XCOMM	Do the equivalent of the 'makedepend' program, but do it right.
 XCOMM
 XCOMM	Usage:
@@ -22,8 +19,6 @@ XCOMM	This script should
 XCOMM	work on both USG and BSD systems.  However, when System V.4 comes out,
 XCOMM	USG users will probably have to change "silent" to "-s" instead of
 XCOMM	"-" (at least, that is what the documentation implies).
-XCOMM
-XCOMM $XFree86: xc/config/util/mdepend.cpp,v 3.9 2001/04/26 20:55:10 dawes Exp $
 XCOMM
 
 CC=PREPROC
@@ -83,7 +78,7 @@ do
 
 	    *)
 		if [ "$endmarker"x = x ]; then
-		    case "$1" in 	
+		    case "$1" in
 			-w)
 			    width="$2"
 			    shift
@@ -108,7 +103,7 @@ do
 			    objsuffix="$2"
 			    shift
 			    ;;
-			
+
 			--*)
 			    echo "$1" | sed 's/^\-\-//' >${TMP}end
 			    endmarker="`cat ${TMP}end`"
@@ -181,7 +176,7 @@ case "$makefile" in
 	;;
 esac
 
-if [ "$verbose"x = "y"x ]; then 
+if [ "$verbose"x = "y"x ]; then
     cat $CPPCMD
 fi
 

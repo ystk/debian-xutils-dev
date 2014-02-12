@@ -27,14 +27,6 @@ in this Software without prior written authorization from The Open Group.
 
 #include "def.h"
 
-extern struct	inclist	inclist[ MAXFILES ],
-			*inclistp, *inclistnext;
-extern const char	*includedirs[ ],
-			**includedirsnext;
-extern char	*notdotdot[ ];
-extern boolean show_where_not;
-extern boolean warn_multiple;
-
 static boolean
 isdot(const char *p)
 {
@@ -64,7 +56,7 @@ issymbolic(const char *dir, const char *component)
 			return (TRUE);
 	if (lstat(buf, &st) == 0
 	&& (st.st_mode & S_IFMT) == S_IFLNK) {
-		*pp++ = copy(buf);
+		*pp++ = strdup(buf);
 		if (pp >= &notdotdot[ MAXDIRS ])
 			fatalerr("out of .. dirs, increase MAXDIRS\n");
 		return(TRUE);
@@ -116,7 +108,7 @@ remove_dotdot(char *path)
 		    char **fp = cp + 2;
 		    char **tp = cp;
 
-		    do 
+		    do
 			*tp++ = *fp; /* move all the pointers down */
 		    while (*fp++);
 		    if (cp != components)
@@ -161,12 +153,12 @@ newinclude(const char *newfile, const char *incstring)
 	ip = inclistp++;
 	if (inclistp == inclist + MAXFILES - 1)
 		fatalerr("out of space: increase MAXFILES\n");
-	ip->i_file = copy(newfile);
+	ip->i_file = strdup(newfile);
 
 	if (incstring == NULL)
 		ip->i_incstring = ip->i_file;
 	else
-		ip->i_incstring = copy(incstring);
+		ip->i_incstring = strdup(incstring);
 
 	inclistnext = inclistp;
 	return(ip);
@@ -264,7 +256,7 @@ inc_path(const char *file, const char *include, int type)
 		if ((type == INCLUDEDOT) ||
 		    (type == INCLUDENEXTDOT) ||
 		    (*include == '/')) {
-			if (stat(include, &st) == 0)
+			if (stat(include, &st) == 0 && !S_ISDIR(st.st_mode))
 				return newinclude(include, include);
 			if (show_where_not)
 				warning1("\tnot in %s\n", include);
@@ -286,7 +278,7 @@ inc_path(const char *file, const char *include, int type)
 				strcpy(path + (p-file) + 1, include);
 			}
 			remove_dotdot(path);
-			if (stat(path, &st) == 0)
+			if (stat(path, &st) == 0 && !S_ISDIR(st.st_mode))
 				return newinclude(path, include);
 			if (show_where_not)
 				warning1("\tnot in %s\n", path);
@@ -304,7 +296,7 @@ inc_path(const char *file, const char *include, int type)
 	for (; *pp; pp++) {
 		sprintf(path, "%s/%s", *pp, include);
 		remove_dotdot(path);
-		if (stat(path, &st) == 0) {
+		if (stat(path, &st) == 0 && !S_ISDIR(st.st_mode)) {
 			includedirsnext = pp + 1;
 			return newinclude(path, include);
 		}

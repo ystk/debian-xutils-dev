@@ -15,6 +15,7 @@ include debian/xsfbs/xsfbs.mk
 # This package contains multiple modules as shipped by upstream. Each module is # contained in a subdirectory in the root dir of the package. You must list each
 # subdirectory explicitly so that the build system knows what to build
 SUBDIRS= gccmakedep imake lndir makedepend util-macros xorg-cf-files
+SUBDIRS_CHECK= makedepend
 
 CFLAGS = -Wall -g
 ifneq (,$(filter noopt,$(DEB_BUILD_OPTIONS)))
@@ -49,11 +50,15 @@ $(STAMP_DIR)/build-%: $(STAMP_DIR)/patch
 		CFLAGS="$(CFLAGS)"
 	cd $*-build && \
 		$(MAKE)
+	# Possible "make check":
+	if echo $(SUBDIRS_CHECK) | grep -qs "\<$*\>"; then \
+		cd $*-build && \
+			$(MAKE) check; \
+	fi
 	>$@
 
 clean: xsfclean
 	dh_testdir
-	dh_testroot
 	rm -f build-stamp
 
 	rm -f config.cache config.log config.status
@@ -79,7 +84,7 @@ binary-arch: build install
 	dh_testdir
 	dh_testroot
 
-	dh_installdocs
+	dh_installdocs debian/versions
 	dh_install --sourcedir=debian/tmp --fail-missing
 	dh_installchangelogs
 	dh_link

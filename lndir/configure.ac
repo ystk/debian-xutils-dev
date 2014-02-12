@@ -21,21 +21,28 @@ dnl  PERFORMANCE OF THIS SOFTWARE.
 dnl
 dnl Process this file with autoconf to create configure.
 
-AC_PREREQ([2.57])
-AC_INIT(lndir, [1.0.1], [https://bugs.freedesktop.org/enter_bug.cgi?product=xorg])
+# Initialize Autoconf
+AC_PREREQ([2.60])
+AC_INIT([lndir], [1.0.3],
+	[https://bugs.freedesktop.org/enter_bug.cgi?product=xorg], [lndir])
+AC_CONFIG_SRCDIR([Makefile.am])
+AC_CONFIG_HEADERS([config.h])
+AC_USE_SYSTEM_EXTENSIONS
+
+# Initialize Automake
 AM_INIT_AUTOMAKE([foreign dist-bzip2])
 AM_MAINTAINER_MODE
 
-AM_CONFIG_HEADER(config.h)
+# Require X.Org macros 1.8 or later for MAN_SUBSTS set by XORG_MANPAGE_SECTIONS
+m4_ifndef([XORG_MACROS_VERSION],
+	  [m4_fatal([must install xorg-macros 1.8 or later before running autoconf/autogen])])
+XORG_MACROS_VERSION(1.8)
+XORG_DEFAULT_OPTIONS
 
-AC_PROG_INSTALL
-AC_PROG_CC
+# Avoid stat() failures if a file has a size that doesn't fit in 32-bits
+AC_SYS_LARGEFILE
 
 # Checks for pkg-config packages
-PKG_CHECK_MODULES(XPROTO, xproto)
-AC_SUBST(XPROTO_CFLAGS)
-
-XORG_MANPAGE_SECTIONS
-XORG_RELEASE_VERSION
+PKG_CHECK_MODULES(XPROTO, xproto >= 7.0.17)
 
 AC_OUTPUT([Makefile])

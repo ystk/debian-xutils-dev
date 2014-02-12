@@ -1,3 +1,100 @@
+xutils-dev (1:7.7~1) unstable; urgency=low
+
+  [ Robert Hooker ]
+  * imake 1.0.5
+  * makedepend 1.0.4
+  * lndir 1.0.3
+  * Bump x11proto-core-dev build dep version, required by the lndir
+    update.
+  * util-macros 1.17.0
+
+  [ Julien Cristau ]
+  * Don't require (fake)root for debian/rules clean.
+  * Build-Depend on autoconf to work around lack of AM_MAINTAINER_MODE in
+    makedepend's configure.ac.
+  * Bump version number as we're nearing X.Org X11R7.7.
+
+ -- Julien Cristau <jcristau@debian.org>  Wed, 14 Mar 2012 20:07:57 +0100
+
+xutils-dev (1:7.6+6) unstable; urgency=low
+
+  [ Julien Cristau ]
+  * Change library directory from /usr/lib64 to /usr/lib on s390x as well
+    (closes: #637903).  Thanks, Aurélien Jarno!
+
+  [ Steve Langasek ]
+  * Mark xutils-dev Multi-Arch: foreign.
+
+ -- Steve Langasek <vorlon@debian.org>  Tue, 08 Nov 2011 19:00:21 -0800
+
+xutils-dev (1:7.6+5) unstable; urgency=low
+
+  * util-macros 1.15.0
+  * Update versions file accordingly.
+  * Bump Standards-Version to 3.9.2 (no changes).
+  * Update Uploaders list. Thanks, David, Andres & Brice!
+  * Wrap Depends.
+
+ -- Cyril Brulebois <kibi@debian.org>  Fri, 24 Jun 2011 11:36:28 +0200
+
+xutils-dev (1:7.6+4) unstable; urgency=low
+
+  * util-macros 1.14.0
+  * Update versions file accordingly.
+
+ -- Cyril Brulebois <kibi@debian.org>  Fri, 03 Jun 2011 01:26:43 +0200
+
+xutils-dev (1:7.6+3) unstable; urgency=low
+
+  [ Robert Hooker ]
+  * util-macros 1.13.0
+
+  [ Cyril Brulebois ]
+  * Add debian/versions, containing upstream to Debian version mappings,
+    to ease lookups.
+  * Install that file through dh_installdocs.
+
+ -- Cyril Brulebois <kibi@debian.org>  Sun, 27 Mar 2011 06:23:02 +0200
+
+xutils-dev (1:7.6+2) unstable; urgency=low
+
+  * Drop xutils-dev build-dep (Closes: #616033). This introduces
+    bootstrapping issues, and its absence seems to only trigger a “Package
+    xorg-macros was not found” message at configure time. It can easily be
+    added back later if it becomes really required.
+  * util-macros 1.12.0.
+
+ -- Cyril Brulebois <kibi@debian.org>  Mon, 07 Mar 2011 23:57:50 +0100
+
+xutils-dev (1:7.6+1) unstable; urgency=low
+
+  * xorg-cf-files 1.0.4.
+  * Update debian/copyright with xorg-cf-files/COPYING.
+  * Refresh 04_xutils-dev-debian.diff
+
+ -- Cyril Brulebois <kibi@debian.org>  Sat, 08 Jan 2011 22:50:19 +0100
+
+xutils-dev (1:7.5+5) unstable; urgency=low
+
+  [ Julien Cristau ]
+  * lndir 1.0.2.
+  * util-macros 1.10.1.
+  * Update debian/copyright from upstream COPYING.
+
+  [ Cyril Brulebois ]
+  * util-macros 1.11.0.
+  * Wrap Build-Depends.
+  * Add build-dep on xutils-dev for lndir.
+  * makedepend 1.0.3.
+  * Introduce SUBDIRS_CHECK where one can list packages which implement a
+    testsuite. Put makedepend in it.
+  * imake 1.0.4.
+  * Drop 02_mkdirhier_rewrite.diff, no longer needed since upstream now
+    just calls mkdir -p.
+  * Add myself to Uploaders.
+
+ -- Cyril Brulebois <kibi@debian.org>  Sun, 31 Oct 2010 16:35:25 +0100
+
 xutils-dev (1:7.5+4) unstable; urgency=low
 
   [ Robert Hooker ]

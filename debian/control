@@ -2,15 +2,24 @@ Source: xutils-dev
 Section: x11
 Priority: optional
 Maintainer: Debian X Strike Force <debian-x@lists.debian.org>
-Uploaders: David Nusinow <dnusinow@debian.org>, Andres Salomon <dilinger@debian.org>, Brice Goglin <bgoglin@debian.org>
-Build-Depends: debhelper (>= 5.0.0), pkg-config, quilt, x11proto-core-dev
-Standards-Version: 3.9.0
+Uploaders: Cyril Brulebois <kibi@debian.org>
+Build-Depends:
+ debhelper (>= 5.0.0),
+ pkg-config,
+ quilt,
+ x11proto-core-dev (>= 7.0.17),
+ autoconf,
+Standards-Version: 3.9.2
 Vcs-Git: git://git.debian.org/git/pkg-xorg/app/xutils-dev
 Vcs-Browser: http://git.debian.org/?p=pkg-xorg/app/xutils-dev.git
 
 Package: xutils-dev
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, cpp
+Multi-Arch: foreign
+Depends:
+ ${shlibs:Depends},
+ ${misc:Depends},
+ cpp,
 Description: X Window System utility programs for development
  xutils-dev provides a set of utility programs shipped with the X Window System
  that do not require the X libraries; many of these programs are useful

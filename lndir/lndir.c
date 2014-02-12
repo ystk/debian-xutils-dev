@@ -31,9 +31,11 @@ in this Software without prior written authorization from The Open Group.
 /* From the original /bin/sh script:
 
   Used to create a copy of the a directory tree that has links for all
-  non-directories (except, by default, those named BitKeeper, RCS, SCCS
-  or CVS.adm).  If you are building the distribution on more than one
-  machine, you should use this technique.
+  non-directories (except, by default, those named BitKeeper, .git, .hg,
+  RCS, SCCS, .svn, CVS or CVS.adm).
+
+  If you are building the distribution on more than one machine,
+  you should use this technique.
 
   If your master sources are located in /usr/local/src/X and you would like
   your link tree to be in /usr/local/src/new-X, do the following:
@@ -43,32 +45,20 @@ in this Software without prior written authorization from The Open Group.
    	%  lndir ../X
 */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <X11/Xos.h>
 #include <X11/Xfuncproto.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
-#if !defined(MINIX) && !defined(Lynx)
+#include <limits.h>
 #include <sys/param.h>
-#endif
 #include <errno.h>
+#include <dirent.h>
 
-#ifndef X_NOT_POSIX
-#include <dirent.h>
-#else
-#ifdef SYSV
-#include <dirent.h>
-#else
-#ifdef USG
-#include <dirent.h>
-#else
-#include <sys/dir.h>
-#ifndef dirent
-#define dirent direct
-#endif
-#endif
-#endif
-#endif
 #ifndef MAXPATHLEN
 #define MAXPATHLEN 2048
 #endif
@@ -82,8 +72,8 @@ int with_revinfo = 0;		/* -withrevinfo */
 char *rcurdir;
 char *curdir;
 
-static void
-quit (int code, char * fmt, ...)
+static void _X_ATTRIBUTE_PRINTF(2,3) _X_NORETURN
+quit (int code, const char * fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
@@ -93,15 +83,15 @@ quit (int code, char * fmt, ...)
     exit (code);
 }
 
-static void
-quiterr (int code, char *s)
+static void _X_NORETURN
+quiterr (int code, const char *s)
 {
     perror (s);
     exit (code);
 }
 
-static void
-msg (char * fmt, ...)
+static void _X_ATTRIBUTE_PRINTF(1,2)
+msg (const char * fmt, ...)
 {
     va_list args;
     if (curdir) {
@@ -145,7 +135,7 @@ equivalent(char *lname, char *rname, char **p)
 /* Recursively create symbolic links from the current directory to the "from"
    directory.  Assumes that files described by fs and ts are directories. */
 static int
-dodir (char *fn,		/* name of "from" directory, either absolute or
+dodir (const char *fn,		/* name of "from" directory, either absolute or
 				   relative to cwd */
        struct stat *fs, 
        struct stat *ts,		/* stats for the "from" directory and cwd */
@@ -182,10 +172,12 @@ dodir (char *fn,		/* name of "from" directory, either absolute or
     if (*(p - 1) != '/')
 	*p++ = '/';
     n_dirs = fs->st_nlink;
+    if (n_dirs == 1)
+	n_dirs = INT_MAX;
     while ((dp = readdir (df))) {
 	if (dp->d_name[strlen(dp->d_name) - 1] == '~')
 	    continue;
-#ifdef __DARWIN__
+#ifdef __APPLE__
 	/* Ignore these Mac OS X Finder data files */
 	if (!strcmp(dp->d_name, ".DS_Store") || 
 	    !strcmp(dp->d_name, "._.DS_Store")) 
@@ -199,11 +191,7 @@ dodir (char *fn,		/* name of "from" directory, either absolute or
 		continue;
 	    }
 
-#ifdef S_ISDIR
-	    if(S_ISDIR(sb.st_mode))
-#else
-	    if ((sb.st_mode & S_IFMT) == S_IFDIR)
-#endif
+	    if (S_ISDIR(sb.st_mode))
 	    {
 		/* directory */
 		n_dirs--;
@@ -212,6 +200,10 @@ dodir (char *fn,		/* name of "from" directory, either absolute or
 					       dp->d_name[2] == '\0')))
 		    continue;
 		if (!with_revinfo) {
+		    if (!strcmp (dp->d_name, ".git"))
+			continue;
+		    if (!strcmp (dp->d_name, ".hg"))
+			continue;
 		    if (!strcmp (dp->d_name, "BitKeeper"))
 			continue;
 		    if (!strcmp (dp->d_name, "RCS"))
@@ -334,45 +326,42 @@ dodir (char *fn,		/* name of "from" directory, either absolute or
 }
 
 int
-main (int ac, char *av[])
+main (int argc, char *argv[])
 {
-    char *prog_name = av[0];
-    char *fn, *tn;
+    char *prog_name = argv[0];
+    const char *fn, *tn;
     struct stat fs, ts;
 
-    while (++av, --ac) {
-	if (strcmp(*av, "-silent") == 0)
+    while (++argv, --argc) {
+	if (strcmp(*argv, "-silent") == 0)
 	    silent = 1;
-	else if (strcmp(*av, "-ignorelinks") == 0)
+	else if (strcmp(*argv, "-ignorelinks") == 0)
 	    ignore_links = 1;
-	else if (strcmp(*av, "-withrevinfo") == 0)
+	else if (strcmp(*argv, "-withrevinfo") == 0)
 	    with_revinfo = 1;
-	else if (strcmp(*av, "--") == 0) {
-	    ++av, --ac;
+	else if (strcmp(*argv, "--") == 0) {
+	    ++argv, --argc;
 	    break;
 	}
 	else
 	    break;
     }
 
-    if (ac < 1 || ac > 2)
-	quit (1, "usage: %s [-silent] [-ignorelinks] fromdir [todir]",
+    if (argc < 1 || argc > 2)
+	quit (1,
+	      "usage: %s [-silent] [-ignorelinks] [-withrevinfo] fromdir [todir]",
 	      prog_name);
 
-    fn = av[0];
-    if (ac == 2)
-	tn = av[1];
+    fn = argv[0];
+    if (argc == 2)
+	tn = argv[1];
     else
 	tn = ".";
 
     /* to directory */
     if (stat (tn, &ts) < 0)
 	quiterr (1, tn);
-#ifdef S_ISDIR
     if (!(S_ISDIR(ts.st_mode)))
-#else
-    if (!(ts.st_mode & S_IFMT) == S_IFDIR)
-#endif
 	quit (2, "%s: Not a directory", tn);
     if (chdir (tn) < 0)
 	quiterr (1, tn);
@@ -380,11 +369,7 @@ main (int ac, char *av[])
     /* from directory */
     if (stat (fn, &fs) < 0)
 	quiterr (1, fn);
-#ifdef S_ISDIR
     if (!(S_ISDIR(fs.st_mode)))
-#else
-    if (!(fs.st_mode & S_IFMT) == S_IFDIR)
-#endif
 	quit (2, "%s: Not a directory", fn);
 
     exit (dodir (fn, &fs, &ts, 0));
