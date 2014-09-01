@@ -2,7 +2,6 @@ usr/share/man/man1/gccmakedep.1
 usr/share/man/man1/imake.1
 usr/share/man/man1/makeg.1
 usr/share/man/man1/xmkmf.1
-usr/share/man/man1/ccmakedep.1
 usr/share/man/man1/mergelib.1
 usr/share/man/man1/revpath.1
 usr/share/man/man1/mkdirhier.1
@@ -16,7 +15,6 @@ usr/bin/imake
 usr/bin/revpath
 usr/bin/makeg
 usr/bin/xmkmf
-usr/bin/ccmakedep
 usr/bin/mergelib
 usr/bin/mkdirhier
 usr/bin/cleanlinks

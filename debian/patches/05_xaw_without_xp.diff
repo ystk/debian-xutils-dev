@@ -6,9 +6,9 @@
 
 Index: xutils-dev/xorg-cf-files/linux.cf
 ===================================================================
---- xutils-dev.orig/xorg-cf-files/linux.cf	2008-06-01 18:36:51.000000000 +0200
-+++ xutils-dev/xorg-cf-files/linux.cf	2008-06-01 18:36:51.000000000 +0200
-@@ -1153,6 +1153,16 @@
+--- xutils-dev.orig/xorg-cf-files/linux.cf
++++ xutils-dev/xorg-cf-files/linux.cf
+@@ -1158,6 +1158,16 @@ InstallNamedTargetNoClobber(install,file
  #define TtClientLibs $(TTLIB) $(XTOOLLIB) $(XLIB)
  #define TtClientDepLibs $(DEPTTLIB) $(DEPXTOOLLIB) $(DEPXLIB)
  
@@ -27,9 +27,9 @@ Index: xutils-dev/xorg-cf-files/linux.cf
  #  define LibDirName		lib64
 Index: xutils-dev/xorg-cf-files/gnu.cf
 ===================================================================
---- xutils-dev.orig/xorg-cf-files/gnu.cf	2008-06-01 18:36:51.000000000 +0200
-+++ xutils-dev/xorg-cf-files/gnu.cf	2008-06-01 18:36:51.000000000 +0200
-@@ -541,6 +541,16 @@
+--- xutils-dev.orig/xorg-cf-files/gnu.cf
++++ xutils-dev/xorg-cf-files/gnu.cf
+@@ -541,6 +541,16 @@ InstallNamedTargetNoClobber(install,file
  #define TtClientLibs $(TTLIB) $(XTOOLLIB) $(XLIB)
  #define TtClientDepLibs $(DEPTTLIB) $(DEPXTOOLLIB) $(DEPXLIB)
  
@@ -48,9 +48,9 @@ Index: xutils-dev/xorg-cf-files/gnu.cf
  #endif
 Index: xutils-dev/xorg-cf-files/FreeBSD.cf
 ===================================================================
---- xutils-dev.orig/xorg-cf-files/FreeBSD.cf	2008-06-01 18:43:49.000000000 +0200
-+++ xutils-dev/xorg-cf-files/FreeBSD.cf	2008-06-01 18:44:03.000000000 +0200
-@@ -570,6 +570,16 @@
+--- xutils-dev.orig/xorg-cf-files/FreeBSD.cf
++++ xutils-dev/xorg-cf-files/FreeBSD.cf
+@@ -570,6 +570,16 @@ XCOMM operating system:  OSName (OSMajor
  #endif
  #endif
  

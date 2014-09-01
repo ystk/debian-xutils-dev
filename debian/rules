@@ -17,12 +17,6 @@ include debian/xsfbs/xsfbs.mk
 SUBDIRS= gccmakedep imake lndir makedepend util-macros xorg-cf-files
 SUBDIRS_CHECK= makedepend
 
-CFLAGS = -Wall -g
-ifneq (,$(filter noopt,$(DEB_BUILD_OPTIONS)))
-	CFLAGS += -O0
-else
-	CFLAGS += -O2
-endif
 ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
 	NUMJOBS = $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
 	MAKEFLAGS += -j$(NUMJOBS)
@@ -42,12 +36,18 @@ build: build-stamp
 build-stamp: $(STAMP_DIR)/genscripts $(foreach dir, $(SUBDIRS), $(STAMP_DIR)/build-$(dir))
 	>$@
 
-$(STAMP_DIR)/build-%: $(STAMP_DIR)/patch
+$(STAMP_DIR)/autotools-dev: $(STAMP_DIR)/prepare
+	dh_autotools-dev_updateconfig
+	>$@
+
+$(STAMP_DIR)/build-%: $(STAMP_DIR)/patch $(STAMP_DIR)/autotools-dev
 	mkdir -p $*-build
 	cd $*-build && \
 		../$*/configure --prefix=/usr --mandir=\$${prefix}/share/man \
 		--infodir=\$${prefix}/share/info $(confflags) \
-		CFLAGS="$(CFLAGS)"
+		--disable-silent-rules \
+		--disable-ccmakedep \
+		$(shell DEB_CFLAGS_MAINT_APPEND=-Wall dpkg-buildflags --export=configure)
 	cd $*-build && \
 		$(MAKE)
 	# Possible "make check":
@@ -60,21 +60,19 @@ $(STAMP_DIR)/build-%: $(STAMP_DIR)/patch
 clean: xsfclean
 	dh_testdir
 	rm -f build-stamp
-
 	rm -f config.cache config.log config.status
 	rm -f */config.cache */config.log */config.status
 	rm -f conftest* */conftest*
 	rm -rf autom4te.cache */autom4te.cache
 	rm -rf *-build
-
+	dh_autotools-dev_restoreconfig
 	dh_clean
 
 install: build
 	dh_testdir
 	dh_testroot
-	dh_clean -k
+	dh_prep
 	dh_installdirs
-
 	set -e; for FILE in $(SUBDIRS); do \
 		$(MAKE) -C $${FILE}-build DESTDIR=$(CURDIR)/debian/tmp install; \
 	done
@@ -83,9 +81,8 @@ install: build
 binary-arch: build install
 	dh_testdir
 	dh_testroot
-
 	dh_installdocs debian/versions
-	dh_install --sourcedir=debian/tmp --fail-missing
+	dh_install --fail-missing
 	dh_installchangelogs
 	dh_link
 	dh_strip

@@ -1541,7 +1541,7 @@ Index: xutils-dev/xorg-cf-files/linux.cf
  #define MkdirHierCmd		mkdir -p
  
  #ifndef HaveLib64
--# if defined (AMD64Architecture) || defined (s390xArchitecture) || defined (Ppc64Architecture)
+-# if defined (AMD64Architecture) || defined (s390xArchitecture) || defined (Ppc64Architecture) || defined (AArch64Architecture)
 -#  define HaveLib64	YES
 -# else
  #  define HaveLib64	NO
@@ -1661,7 +1661,7 @@ Index: xutils-dev/xorg-cf-files/linux.cf
  # define ServerOSDefines	XFree86ServerOSDefines -DDDXTIME -DPART_NET
 @@ -913,7 +1016,7 @@ InstallNamedTargetNoClobber(install,file
  #ifdef PpcArchitecture
- # define DefaultCCOptions	
+ # define DefaultCCOptions
  # ifndef OptimizedCDebugFlags
 -#  define OptimizedCDebugFlags	DefaultGcc2PpcOpt
 +#  define OptimizedCDebugFlags DefaultGcc2DebugOpt DefaultGcc2OptimizeOpt GccAliasingArgs
@@ -1717,7 +1717,16 @@ Index: xutils-dev/xorg-cf-files/linux.cf
  # endif
  # define LinuxMachineDefines   -D__amd64__
  # define ServerOSDefines	XFree86ServerOSDefines -DDDXTIME
-@@ -1023,26 +1127,6 @@ InstallNamedTargetNoClobber(install,file
+@@ -991,7 +1095,7 @@
+ 
+ #ifdef AArch64Architecture
+ # ifndef OptimizedCDebugFlags
+-#  define OptimizedCDebugFlags DefaultGcc2AArch64Opt
++#  define OptimizedCDebugFlags DefaultGcc2DebugOpt DefaultGcc2OptimizeOpt GccAliasingArgs
+ # endif
+ # define LinuxMachineDefines   -D__aarch64__
+ # define ServerOSDefines   XFree86ServerOSDefines -DDDXTIME
+@@ -1032,26 +1136,6 @@
  # define ConnectionFlags	-DUNIXCONN -DTCPCONN
  #endif
  
@@ -1744,7 +1753,7 @@ Index: xutils-dev/xorg-cf-files/linux.cf
  #ifndef StaticLibrary
  # define StaticLibrary(libpath,libname) -Wl,-Bstatic Concat(-L,libpath) Concat(-l,libname) -Wl,-Bdynamic
  #endif
-@@ -1087,3 +1171,59 @@ InstallNamedTargetNoClobber(install,file
+@@ -1096,3 +1180,59 @@ InstallNamedTargetNoClobber(install,file
  #ifndef XFree86ServerOSDefines
  # define XFree86ServerOSDefines
  #endif
@@ -2011,19 +2020,17 @@ Index: xutils-dev/xorg-cf-files/NetBSD.cf
  #else
  #define DlLibrary		/**/
  #endif
-@@ -336,7 +508,11 @@ XCOMM operating system:  OSName (OSMajor
+@@ -336,6 +508,10 @@ XCOMM operating system:  OSName (OSMajor
  /* NetBSD doesn't have gperf in the base install */
  #define DontRebuildGperfOutput	YES
  
--/* 
 +#if NetBSDDistribution == NetBSDDebian
 +#define HasPerl			YES
 +#endif
 +
-+/*
+ /*
   * NetBSD doesn't have perl in default system
   * you may override this in host.def if you installed perl from the packages
-  */
 @@ -355,7 +531,13 @@ XCOMM operating system:  OSName (OSMajor
  /*
   * Make & install Features
@@ -2475,7 +2482,7 @@ Index: xutils-dev/xorg-cf-files/xfree86.cf
  /*
   * GNU Compiler stuff
   */
-@@ -2010,33 +2043,39 @@ XFREE86JAPANESEDOCDIR = $(DOCDIR)/Japane
+@@ -2010,39 +2043,45 @@ XFREE86JAPANESEDOCDIR = $(DOCDIR)/Japane
  # define GccAliasingArgs      /* */
  #endif
  
@@ -2496,6 +2503,13 @@ Index: xutils-dev/xorg-cf-files/xfree86.cf
  # ifndef DefaultGcc2AMD64Opt
 -#  define DefaultGcc2AMD64Opt -O2 -fno-strength-reduce GccAliasingArgs
 +#  define DefaultGcc2AMD64Opt DefaultGcc2OptimizeOpt GccAliasingArgs
+ # endif
+ #endif
+ 
+ #if HasGcc2 && defined(AArch64Architecture)
+ # ifndef DefaultGcc2AArch64Opt
+-#  define DefaultGcc2AArch64Opt -O2 GccAliasingArgs
++#  define DefaultGcc2AArch64Opt DefaultGcc2OptimizeOpt GccAliasingArgs
  # endif
  #endif
  
@@ -2568,8 +2582,8 @@ Index: xutils-dev/xorg-cf-files/xorg.cf
  
 @@ -602,8 +618,13 @@ RELEASE_VERSION = ReleaseVersion
   *  Glide is available for Alpha, therefore build tdfx DRM module.
-  *  SiS is 64-bit unclean as of this writing. 
-  */  
+  *  SiS is 64-bit unclean as of this writing.
+  */
 +#  if HasGlide3
 +#   define TdfxDriDriver   tdfx
 +#  else

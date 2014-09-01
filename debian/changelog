@@ -1,3 +1,48 @@
+xutils-dev (1:7.7+3) unstable; urgency=medium
+
+  * gccmakedep 1.0.3.
+  * util-macros 1.19.0.
+  * imake 1.0.7.
+    + drop -Werror=format-security FTBFS patch, applied upstream
+  * The new upstream releases allow us to go back to default cpp version
+    (closes: #742436)
+  * Disable ccmakedep because it's actually not fixed with the new imake
+    release, and nothing in Debian seems to use it.  Incidentally, this
+    closes: #693129.
+  * Remove Cyril from Uploaders.
+
+ -- Julien Cristau <jcristau@debian.org>  Wed, 21 May 2014 21:43:34 +0200
+
+xutils-dev (1:7.7+2) unstable; urgency=medium
+
+  [ Julien Cristau ]
+  * util-macros 1.18.0.
+
+  [ Wookey ]
+  * Add missing AArch64/arm64 default C options (closes: #734944)
+
+ -- Julien Cristau <jcristau@debian.org>  Sun, 12 Jan 2014 19:10:02 +0100
+
+xutils-dev (1:7.7+1) unstable; urgency=low
+
+  * xorg-cf-files: Debian GNU/Hurd uses /usr as ProjectRoot and /usr/share/man
+    for manpages (closes: #638016).  Thanks, Svante Signell.
+  * imake 1.0.6.
+  * xorg-cf-files 1.0.5.
+  * makedepend 1.0.5.
+  * Update patches for new xorg-cf-files.
+  * Use dh_autotools-dev_* to update config.{guess,sub}.
+  * Bump debhelper compat level to 7.
+  * Replace dh_clean -k with dh_prep.
+  * Use dpkg-buildflags.
+  * Make imake build with -Werror=format-security.
+  * util-macros 1.17.1.
+  * Disable silent build rules.
+  * Force RAWCPP to cpp-4.7 since 4.8 seems to break stuff (adds 40 blank lines
+    before the #!).
+
+ -- Julien Cristau <jcristau@debian.org>  Mon, 09 Sep 2013 20:23:08 +0200
+
 xutils-dev (1:7.7~1) unstable; urgency=low
 
   [ Robert Hooker ]
